@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: Seahouse 4 Businesses
-Plugin URI:  http://URI_Of_Page_Describing_Plugin_and_Updates
-Description: Generates Schema for Organization and Offers.
+Plugin URI:  http://seahouse.me
+Description: Seahouse 4 Businesses lets you add your Business-Data to your site. Google & Co. will love it.
 Version:     0.1
 Author:      Valentin Seehausen
 Author URI:  http://seahouse.me
@@ -26,3 +26,8 @@ along with Seahouse 4 Businesses. If not, see https://www.gnu.org/licenses/gpl-3
 
 Have fun and enjoy life.
 */
+
+/******************************
+	Register menu
+*******************************/
+require_once('admin/register-menu.php');
