@@ -31,3 +31,9 @@ Have fun and enjoy life.
 	Register menu
 *******************************/
 require_once('admin/register-menu.php');
+
+
+/******************************
+	Register Shortcodes
+*******************************/
+require_once('admin/shortcodes/sc_organization.php');
