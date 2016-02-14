@@ -29,14 +29,101 @@ function s4b_organization_requirements() {
 			'description' => 'The Name of the Organization.',
 		),
 		array(
+			'name'        => '@type',
+			'title'       => 'Type of your Business',
+			'description' => 'Most difficult part: Choose a type that describes your business best. Check this <a href="https://docs.google.com/spreadsheets/d/1Ed6RmI01rx4UdW40ciWgz2oS_Kx37_-sPi7sba_jC3w/edit#gid=0" target="_blank">List</a>. Default: <i>LocalBusiness</i>',
+		),
+		array(
+			'name'        => 'url',
+			'title'       => 'URL',
+			'description' => 'The fully-qualified URL of the specific business location.',
+		),
+		array(
+			'name'        => 'telephone',
+			'title'       => 'Telephone',
+			'description' => 'Business phone number, inclusive of country code. Specify the public phone number of the business normally used by customers.',
+		),
+		array(
 			'name'        => 'address',
 			'title'       => 'Address',
 			'@type'       => 'PostalAddress',
-			'fields'      => array(
+			'fields'      =>
+			array(
 				array(
 					'name'        => 'streetAddress',
 					'title'       => 'Street',
 					'description' => 'The Street of the Organization.',
+				),
+				array(
+					'name'        => 'addressLocality',
+					'title'       => 'City',
+					'description' => 'City of your department.',
+				),
+				array(
+					'name'        => 'addressRegion',
+					'title'       => 'State or Province',
+					'description' => 'State or Province of your Organization.',
+				),
+				array(
+					'name'        => 'postalCode',
+					'title'       => 'Postal Code',
+					'description' => 'Postal Code of your Organization.',
+				),
+				array(
+					'name'        => 'addressCountry',
+					'title'       => 'Country',
+					'description' => 'The 2-letter ISO 3166-1 alpha-2 country code.',
+				),
+			),
+		),
+		array(
+			'name'        => 'geo',
+			'title'       => 'Geo Location',
+			'@type'       => 'GeoCoordinates',
+			'fields'      =>
+			array(
+				array(
+					'name'        => 'latitude',
+					'title'       => 'Latitude',
+					'description' => 'The latitude of the business location. The precision should be at least 5 decimal places. Go to Googlemaps to get it.',
+				),
+				array(
+					'name'        => 'longitude',
+					'title'       => 'Longitude',
+					'description' => 'The longitude of the business location. The precision should be at least 5 decimal places. Go to Googlemaps to get it.',
+				),
+			),
+		),
+		array(
+			'name'        => 'openingHoursSpecification',
+			'title'       => 'Opening Hours Specification',
+			'@type'       => 'OpeningHoursSpecification',
+			'fields'      =>
+			array(
+				array(
+					'name'        => 'opens',
+					'title'       => 'Opens',
+					'description' => 'The time the business location opens, in hh:mm:ss format.',
+				),
+				array(
+					'name'        => 'closes',
+					'title'       => 'Closes',
+					'description' => 'The time the business location closes, in hh:mm:ss format.',
+				),
+				array(
+					'name'        => 'dayOfWeek',
+					'title'       => 'Day of Week',
+					'description' => 'One or more of the following: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday',
+				),
+				array(
+					'name'        => 'validFrom',
+					'title'       => 'Valid From',
+					'description' => 'The start date of a seasonal business closure, in YYYY-MM-DD format.',
+				),
+				array(
+					'name'        => 'validThrough',
+					'title'       => 'Valid Through',
+					'description' => 'The end date of a seasonal business closure, in YYYY-MM-DD format.',
 				),
 			),
 		),
@@ -57,9 +144,17 @@ function s4b_generate_form_field($field, $values, $parent = 's4b_organization[%s
 		$payload = '';
 		$payload .= array_key_exists( 'title', $field ) ? '<tr valign="top"><th scope="row">' . $field['title'] . '</th>' : '';
 		$fields = $field['fields'];
-		$values = $values[$field['name']];
+		$sub_values = $values[$field['name']];
 		$parent = sprintf($parent, $field['name']) . '[%s]';
-		$payload .= s4b_generate_multiple_form_fields($fields, $values, $parent);
+
+		if ( array_key_exists( '@type', $field ) ) {
+			// hidden input for @type specification
+			$options_index =  sprintf($parent, '@type');
+			$value =          $field['@type'];
+			$payload .= '     <input type="hidden" name="' . $options_index . '" value="' . $value . '" />';
+		}
+
+		$payload .= s4b_generate_multiple_form_fields($fields, $sub_values, $parent);
 		return $payload;
 	} else {
 		// Generates single field
@@ -82,6 +177,7 @@ FIELD;
 function s4b_generate_multiple_form_fields($fields, $values, $parent = 's4b_organization[%s]') {
 	// Generates form fields out of requirements;
 	$payload = '';
+
 	foreach ( $fields as $field ) {
 		$payload .= s4b_generate_form_field( $field, $values, $parent );
 	}
