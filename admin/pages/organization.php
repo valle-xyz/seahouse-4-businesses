@@ -6,12 +6,17 @@ if( ! defined('ABSPATH') ) die();
  */
 function s4b_organization_requirements() {
 	// registers required data. used to generate form fields
-	// fields as array with values
-	//   'name' => string,        // intern key of option, should be same as Knowledge Graph property, functions as input name
-	//   'title' => string        // labels the field
-	//   'description' => string  // Explains user what to write gets i18s through __(), in english
-	//   '@type' => string        // if @type is set, sub fields will also be generated
-	//   'fields' => string       // contains an array with subfields
+	// @fields array $args {
+	//    Field.
+	//
+	//    @string name            // intern key of option, should be same as Knowledge Graph property, functions as input name
+	//    @string title           // labels the field
+	//    @string description     // Explains user what to write gets i18s through __(), in english
+	//   -- or:
+	//    @string @type           // if @type is set, sub fields will also be generated
+	//    @string fields          // contains an array with subfields
+	//    @string title Optional  // if available prints out title for subfields
+	// }
 	$payload = array(
 		array(
 			'name'        => '@id',
@@ -25,11 +30,14 @@ function s4b_organization_requirements() {
 		),
 		array(
 			'name'        => 'address',
+			'title'       => 'Address',
 			'@type'       => 'PostalAddress',
 			'fields'      => array(
-				'name'        => 'name',
-				'title'       => 'Organization Name',
-				'description' => 'The Name of the Organization.',
+				array(
+					'name'        => 'streetAddress',
+					'title'       => 'Street',
+					'description' => 'The Street of the Organization.',
+				),
 			),
 		),
 	);
@@ -38,38 +46,44 @@ function s4b_organization_requirements() {
 }
 function s4b_generate_form_field($field, $values, $parent = 's4b_organization[%s]') {
 	// generates form field
-	// $field: array, the required data
-	// $values: array, the options with previous values
+	// @param field: array, the required data
+	// @param values: array, the options with previous values
+	// @param parent defines which field this is subfield of
+
 	if ( !$field ) return;
 
-	// if ( array_key_exists( '@type', $field ) ) {
-	// 	// Field has subfields, that get generated seperatly
-	// 	$fields = $field['fields'];
-	// 	$values = $values[$field['name']];
-	// 	$payload = s4b_generate_multiple_form_fields($fields, $values);
-	// 	return $payload;
-	// }
+	if ( array_key_exists( 'fields', $field ) ) {
+		// Field has subfields, that get generated seperatly
+		$payload = '';
+		$payload .= array_key_exists( 'title', $field ) ? '<tr valign="top"><th scope="row">' . $field['title'] . '</th>' : '';
+		$fields = $field['fields'];
+		$values = $values[$field['name']];
+		$parent = sprintf($parent, $field['name']) . '[%s]';
+		$payload .= s4b_generate_multiple_form_fields($fields, $values, $parent);
+		return $payload;
+	} else {
+		// Generates single field
+		$options_index = sprintf($parent, $field['name']);
+		$value =         $values[$field['name']];
+		$title =         __( $field['title'], 'wporg' );
+		$description =   __( $field['description'], 'wporg' );
 
-	$options_index = sprintf($parent, $field['name']);
-	$value =         $values[$field['name']];
-	$title =         __( $field['title'], 'wporg' );
-	$description =   __( $field['description'], 'wporg' );
-
-	$payload = <<<FIELD
-		<tr valign="top"><th scope="row">{$title}</th>
-			<td>
-				<input type="text" name="{$options_index}" value="{$value}" /><br />
-				<label class="description" for="{$options_index}">{$description}</label>
-			</td>
-		</tr>
+		$payload = <<<FIELD
+			<tr valign="top"><th scope="row">{$title}</th>
+				<td>
+					<input type="text" name="{$options_index}" value="{$value}" /><br />
+					<label class="description" for="{$options_index}">{$description}</label>
+				</td>
+			</tr>
 FIELD;
-	return $payload;
+		return $payload;
+	}
 }
-function s4b_generate_multiple_form_fields($fields, $values) {
+function s4b_generate_multiple_form_fields($fields, $values, $parent = 's4b_organization[%s]') {
 	// Generates form fields out of requirements;
 	$payload = '';
 	foreach ( $fields as $field ) {
-		$payload .= s4b_generate_form_field( $field, $values );
+		$payload .= s4b_generate_form_field( $field, $values, $parent );
 	}
 	return $payload;
 }
