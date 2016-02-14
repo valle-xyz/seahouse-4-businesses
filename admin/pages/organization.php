@@ -199,7 +199,16 @@ function s4b_index_page() {
 		<?php endif; ?>
 
 		<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
-		Seahouse 4 Businesses lets you add your Business-Data to your site. Google & Co. will love it.
+		<p>Seahouse 4 Businesses lets you add your Business-Data to your site. Google & Co. will love it.</p>
+		<p>When you are done, please edit on of your pages, preferably your start page.
+			Include the shortcode <i>[s4b-organization]</i> somewhere and save.
+			Then Go to
+			<a href="https://developers.google.com/structured-data/testing-tool/" target="_blank">
+				Googles Structured Data Testing Tool
+			</a>
+			and test your markup. Open the link, click <i>type Url</i>, paste the slug
+			of your page containing the shortcode and check if everything is set and correct.
+		</p>
 
 
 		<form method="post" action="options.php">

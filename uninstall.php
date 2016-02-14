@@ -5,5 +5,4 @@ if ( !defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // Delete all entries to database
-
-// no entries right now
+delete_option( 's4b_organization' );
